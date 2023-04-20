@@ -1,4 +1,6 @@
 from tqdm import tqdm
+from vec3 import *
+import numpy as np
 
 print('hello world')
 
@@ -24,6 +26,21 @@ def write_image(filename,w,h,pixels):
                 F.write(out_str)
 
 write_image('sample.ppm',256,256,None)
+
+v1 = vec3(0,1,2)
+v2 = vec3(0,1,2)
+v3 = v1+v2
+v4 = v1/2
+v5 = v1 * v2
+v6 = v1 - 4
+v7 = v1 / v2
+print(v7)
+
+print(v2.unit_vector())
+
+print(v4.d())
+print(v4.length())
+
 
 print('done')
 
