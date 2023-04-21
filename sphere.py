@@ -1,6 +1,8 @@
 
 from hittable import *
-from vec3 import *
+#from vec3 import *
+from vector_operations import *
+import numpy as np
 
 class sphere(hittable):
     def __init__(self,center,radius):
@@ -9,9 +11,9 @@ class sphere(hittable):
 
     def hit(self,r,t_min,t_max):
         oc = r.origin - self.center
-        a = r.dir.length_squared()
-        half_b = dot(oc,r.dir)
-        c = oc.length_squared() - self.radius*self.radius
+        a = length_squared(r.dir)
+        half_b = np.dot(oc,r.dir)
+        c = length_squared(oc) - self.radius*self.radius
 
         disc = half_b*half_b - a*c
         if disc<0:
