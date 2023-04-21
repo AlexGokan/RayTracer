@@ -31,23 +31,27 @@ def ray_color(r,world,depth):
 
     unit_dir = unit_vector(r.dir)
     t = 0.5*(unit_dir[1] + 1)
-    return np.array([1,1,1])*(1-t) + np.array([.5,.7,1])*t
+    return np.array([1,1,1])*(1-t) + np.array([.5,.7,1])*t#sky shader
 
 
 
 
 def main():
 
-    samples_per_pixel = 2
-    max_depth = 20
+    samples_per_pixel = 1
+    max_depth = 6
 
-    green_lambert = lambertian(np.array([.8,.8,1]))
-    metal_shader = metal(np.array([1,1,1]))
+    blue_lambert = lambertian(np.array([.8,.8,1]))
+    ground_mat = lambertian(np.array([.8,1,.7]))
+    metal_shader = metal(np.array([1,1,1]),roughness=0.2)
+    glass_shader = dielectric(1.5)
 
-    s1 = sphere(np.array([0, 0, -1]), 0.5,metal_shader)
-    s2 = sphere(np.array([0,-100.5,-1]), 100,green_lambert)
-    s3 = sphere(np.array([.7, .2, -1]), 0.2,green_lambert)
-    world = hittable_list([[s1,s2],[s3]])
+    s_ground = sphere(np.array([0,-100.5,-1]),100,ground_mat)
+    s1 = sphere(np.array([0,0,-1]),0.5,blue_lambert)
+    s2 = sphere(np.array([-1,0,-1]),0.5,glass_shader)
+    s22 = sphere(np.array([-1,0,-1]),-0.4,glass_shader)
+    s3 = sphere(np.array([1,0,-1]),0.5,metal_shader)
+    world = hittable_list([s1,s2,s3,s_ground])
 
     aspect_ratio = 16/9
     img_width = 300
@@ -75,8 +79,7 @@ def main():
 
                 r = cam.get_ray(u,v)
                 pixel_color = pixel_color + ray_color(r,world,max_depth)
-                #r = ray(origin,lower_left_corner + horizontal*u + vertical*v - origin)
-                #pixel_color = ray_color(r,world)
+
             pixel_color = pixel_color/samples_per_pixel
             colors.append(pixel_color)
 

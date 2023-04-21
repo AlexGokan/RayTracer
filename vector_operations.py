@@ -38,3 +38,10 @@ def near_zero(x):
 
 def reflect(v,n):
     return v - 2*np.dot(v,n)*n
+
+def refract(uv,n,etai_over_etat):
+    cos_theta = min(np.dot(-uv,n),1.0)
+    r_out_perp = etai_over_etat * (uv + cos_theta*n)
+    r_out_parallel = -np.sqrt(abs(1-length_squared(r_out_perp))) * n
+
+    return r_out_perp + r_out_parallel
