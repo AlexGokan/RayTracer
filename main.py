@@ -9,8 +9,12 @@ from fileio import *
 def ray_color(r):
     #t = hit_sphere(vec3(0,0,-1),0.5,r)
 
-    s = sphere(vec3(0,0,-1),0.5)
-    hit,record = s.hit(r,float('-inf'),float('inf'))
+    s1 = sphere(vec3(0,0,-1),0.5)
+    s2 = sphere(vec3(.7,.7,-1),0.4)
+    s3 = sphere(vec3(.7,.2,-1),0.2)
+    slist = hittable_list([[s1,s2],[s3]])
+
+    hit,record = slist.hit(r,float('-inf'),float('inf'))
 
 
     if hit and record.t>0:
@@ -27,7 +31,7 @@ def ray_color(r):
 def main():
 
     aspect_ratio = 16/9
-    img_width = 350
+    img_width = 150
     img_height = int(img_width/aspect_ratio)
 
     viewport_height = 2

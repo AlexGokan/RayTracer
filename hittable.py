@@ -31,9 +31,13 @@ class hittable_list(hittable):
     def hit(self,r,t_min,t_max):
         hit_anything = False
         closest_so_far = t_max
+        rec = hit_record(None,None,None)
         for h in self.objects:
-            hit,rec = h.hit(r,t_min,closest_so_far)
+            if isinstance(h,list):
+                h = hittable_list(h)
+            hit,temp_rec = h.hit(r,t_min,closest_so_far)
             if hit:
                 hit_anything = True
-                closest_so_far = rec.t
+                closest_so_far = temp_rec.t
+                rec = temp_rec
         return hit_anything,rec
