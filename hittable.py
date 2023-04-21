@@ -10,6 +10,7 @@ class hit_record:
         self.normal = normal
         self.t = t
         self.front_face = None
+        self.material = None
 
     def set_face_normal(self,r,outward_normal):
         self.front_face = np.dot(r.dir,outward_normal) < 0

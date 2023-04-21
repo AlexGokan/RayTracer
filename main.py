@@ -9,6 +9,7 @@ from hittable import *
 from sphere import *
 from fileio import *
 from camera import *
+from material import *
 
 def ray_color(r,world,depth):
     #t = hit_sphere(vec3(0,0,-1),0.5,r)
@@ -19,8 +20,13 @@ def ray_color(r,world,depth):
     hit,record = world.hit(r,0.001,float('inf'))
 
     if hit:
-        target = record.p + record.normal + random_vec3_in_sphere()
-        return ray_color(ray(record.p,target-record.p),world,depth-1) * 0.5
+
+        mat_scat_bool,scattered,attenuation = record.material.scatter(r,record)
+        if mat_scat_bool:
+            return attenuation * ray_color(scattered,world,depth-1)
+
+        #target = record.p + random_vec3_in_hemisphere(record.normal)
+        #return ray_color(ray(record.p,target-record.p),world,depth-1) * 0.5
 
 
     unit_dir = unit_vector(r.dir)
@@ -35,10 +41,12 @@ def main():
     samples_per_pixel = 2
     max_depth = 20
 
+    green_lambert = lambertian(np.array([.8,.8,1]))
+    metal_shader = metal(np.array([1,1,1]))
 
-    s1 = sphere(np.array([0, 0, -1]), 0.5)
-    s2 = sphere(np.array([0,-100.5,-1]), 100)
-    s3 = sphere(np.array([.7, .2, -1]), 0.2)
+    s1 = sphere(np.array([0, 0, -1]), 0.5,metal_shader)
+    s2 = sphere(np.array([0,-100.5,-1]), 100,green_lambert)
+    s3 = sphere(np.array([.7, .2, -1]), 0.2,green_lambert)
     world = hittable_list([[s1,s2],[s3]])
 
     aspect_ratio = 16/9
