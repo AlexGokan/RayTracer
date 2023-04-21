@@ -2,7 +2,8 @@ from tqdm import tqdm
 from vec3 import *
 from ray import *
 import numpy as np
-
+from hittable import *
+from sphere import *
 
 
 def color_string(color):
@@ -39,15 +40,27 @@ def write_image(filename,w,h,pixels):
 
 def hit_sphere(center,radius,r):
     oc = r.origin - center
-    a = dot(r.dir,r.dir)
-    b = dot(oc,r.dir)*2
-    c = dot(oc,oc) - radius*radius
-    discriminant = b*b - 4*a*c
-    return discriminant>0
+    a = r.dir.length_squared()
+    half_b = dot(oc,r.dir)
+    c = oc.length_squared() - radius*radius
+    discriminant = half_b*half_b - a*c
+
+    if discriminant < 0:
+        return -1
+    else:
+        return (-half_b - np.sqrt(discriminant)) / a
 
 def ray_color(r):
-    if hit_sphere(vec3(0,0,-1),0.5,r):
-        return vec3(1,0,0)
+    #t = hit_sphere(vec3(0,0,-1),0.5,r)
+
+    s = sphere(vec3(0,0,-1),0.5)
+    record = hit_record(None,None,None)
+    hit,record = s.hit(r,float('-inf'),float('inf'),record)
+
+
+    if hit and record.t>0:
+        N = (r.at(record.t) - vec3(0,0,-1)).unit_vector()
+        return (N+1)*0.5
 
     unit_dir = r.dir.unit_vector()
     t = 0.5*(unit_dir.y() + 1)
