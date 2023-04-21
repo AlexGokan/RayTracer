@@ -89,3 +89,13 @@ def dot(a,b):
 def cross(a, b):
     return vec3(*tuple(np.cross(a.d(), b.d())))
 
+def random_vec3(low=None,high=None):
+    if low is None or high is None:
+        return vec3(np.random.uniform(),np.random.uniform(),np.random.uniform())
+    return vec3(np.random.uniform(low,high),np.random.uniform(low,high),np.random.uniform(low,high))
+
+def random_vec3_in_sphere():
+    while True:
+        p = random_vec3(-1,1)
+        if p.length_squared() <= 1:
+            return p
