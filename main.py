@@ -4,51 +4,7 @@ from ray import *
 import numpy as np
 from hittable import *
 from sphere import *
-
-
-def color_string(color):
-    ir = 255.999 * color.x()
-    ig = 255.999 * color.y()
-    ib = 255.999 * color.z()
-    #ir,ig,ib = tuple((color*255.999).d())#nicer, but way slower
-    out_str = str(ir) + ' ' + str(ig) + ' ' + str(ib) + '\n'
-    return out_str
-
-
-def write_image(filename,w,h,pixels):
-
-    with open(filename,'w') as F:
-        header = 'P3\n' + str(w) + ' ' + str(h) + '\n255\n'
-        F.write(header)
-
-        idx = 0
-        for i in tqdm(range(h)):
-            for j in range(w):
-                #r = i/(h-1)
-                #g = j/(w-1)
-                #b = 0.25
-
-                #color = vec3(r,g,b)
-                color = pixels[idx]
-                idx += 1
-
-                out_str = color_string(color)
-                F.write(out_str)
-
-
-
-
-def hit_sphere(center,radius,r):
-    oc = r.origin - center
-    a = r.dir.length_squared()
-    half_b = dot(oc,r.dir)
-    c = oc.length_squared() - radius*radius
-    discriminant = half_b*half_b - a*c
-
-    if discriminant < 0:
-        return -1
-    else:
-        return (-half_b - np.sqrt(discriminant)) / a
+from fileio import *
 
 def ray_color(r):
     #t = hit_sphere(vec3(0,0,-1),0.5,r)
