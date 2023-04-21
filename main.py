@@ -10,8 +10,7 @@ def ray_color(r):
     #t = hit_sphere(vec3(0,0,-1),0.5,r)
 
     s = sphere(vec3(0,0,-1),0.5)
-    record = hit_record(None,None,None)
-    hit,record = s.hit(r,float('-inf'),float('inf'),record)
+    hit,record = s.hit(r,float('-inf'),float('inf'))
 
 
     if hit and record.t>0:

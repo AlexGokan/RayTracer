@@ -7,7 +7,7 @@ class sphere(hittable):
         self.center = center
         self.radius = radius
 
-    def hit(self,r,t_min,t_max,rec):
+    def hit(self,r,t_min,t_max):
         oc = r.origin - self.center
         a = r.dir.length_squared()
         half_b = dot(oc,r.dir)
@@ -15,17 +15,19 @@ class sphere(hittable):
 
         disc = half_b*half_b - a*c
         if disc<0:
-            return False,rec
+            return False,None
         sqrtd = np.sqrt(disc)
 
         root = (-half_b - sqrtd) / a
         if root<t_min or t_max<root:
             root = (-half_b+sqrtd)/a
             if root<t_min or t_max<root:
-                return False,rec
+                return False,None
 
+        rec = hit_record(None,None,None)
         rec.t = root
         rec.p = r.at(rec.t)
-        rec.normal = (rec.p-self.center)/self.radius
+        outward_normal = (rec.p-self.center)/self.radius
+        rec.set_face_normal(r,outward_normal)
 
         return True,rec
