@@ -68,7 +68,7 @@ class vec3:
         return np.sqrt(self.length_squared())
 
     def dot(self,other):
-        return vec3(*tuple(np.dot(self.d(),other.d())))
+        return np.dot(self.d(),other.d())
 
     def cross(self,other):
         return vec3(*tuple(np.cross(self.d(),other.d())))
@@ -77,9 +77,15 @@ class vec3:
         return vec3(*tuple(self.d()/self.length()))
 
     def __str__(self):
-        return str(self.d())
+        return 'vec3: ' + str(self.d())
 
     def __repr__(self):
         return self.__str__()
 
+
+def dot(a,b):
+    return np.dot(a.d(),b.d())
+
+def cross(a, b):
+    return vec3(*tuple(np.cross(a.d(), b.d())))
 
