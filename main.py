@@ -11,6 +11,8 @@ from fileio import *
 from camera import *
 from material import *
 
+import sys
+
 def ray_color(r,world,depth):
     #t = hit_sphere(vec3(0,0,-1),0.5,r)
     if depth <= 0:
@@ -38,8 +40,8 @@ def ray_color(r,world,depth):
 
 def main():
 
-    samples_per_pixel = 1
-    max_depth = 6
+    samples_per_pixel = 3
+    max_depth = 2
 
     blue_lambert = lambertian(np.array([.8,.8,1]))
     ground_mat = lambertian(np.array([.8,1,.7]))
@@ -49,12 +51,12 @@ def main():
     s_ground = sphere(np.array([0,-100.5,-1]),100,ground_mat)
     s1 = sphere(np.array([0,0,-1]),0.5,blue_lambert)
     s2 = sphere(np.array([-1,0,-1]),0.5,glass_shader)
-    s22 = sphere(np.array([-1,0,-1]),-0.4,glass_shader)
+    s22 = sphere(np.array([-1,0,-1]),-0.45,glass_shader)
     s3 = sphere(np.array([1,0,-1]),0.5,metal_shader)
-    world = hittable_list([s1,s2,s3,s_ground])
+    world = hittable_list([s1,s2,s22,s3,s_ground])
 
     aspect_ratio = 16/9
-    img_width = 300
+    img_width = 150
     img_height = int(img_width/aspect_ratio)
 
     viewport_height = 2
@@ -66,11 +68,13 @@ def main():
     vertical = np.array([0,viewport_height,0])
     lower_left_corner = origin - horizontal/2 - vertical/2 - np.array([0,0,focal_len])
 
+    #cam = camera(aspect_ratio=aspect_ratio,focal_length=focal_len,vert_fov=45)
+    cam = camera(aspect_ratio=aspect_ratio,focal_length=1,vert_fov=90,lookfrom=np.array([-2,2,1]),lookat=np.array([0,0,-1]))
+    print(str(img_width) +  ' x ' + str(img_height))
+
+
     colors = []
-
-    cam = camera(aspect_ratio=aspect_ratio,viewport_height=viewport_height,focal_length=focal_len)
-
-    for j in tqdm(range(img_height)):
+    for j in tqdm(range(img_height),desc='Rendering:'):
         for i in range(img_width):
             pixel_color = np.array([0,0,0])
             for s in range(samples_per_pixel):
@@ -83,9 +87,13 @@ def main():
             pixel_color = pixel_color/samples_per_pixel
             colors.append(pixel_color)
 
-
-
-    write_image('sample.ppm',img_width,img_height,colors)
+    if len(sys.argv) < 2:
+        filename = None
+    else:
+        filename = sys.argv[1]
+    if filename is None or filename == '':
+        filename = 'sample.ppm'
+    write_image(filename,img_width,img_height,colors)
 
 
 

@@ -18,7 +18,7 @@ def write_image(filename,w,h,pixels,gamma_correct='sqrt'):
         F.write(header)
 
         idx = 0
-        for i in tqdm(range(h)):
+        for i in tqdm(range(h),desc='Saving: '):
             for j in range(w):
                 #r = i/(h-1)
                 #g = j/(w-1)
