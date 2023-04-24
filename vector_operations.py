@@ -30,6 +30,12 @@ def random_vec3_in_hemisphere(normal):
     else:
         return -1 * v
 
+def random_vec2_in_unit_disk():
+    while True:
+        p = np.array([np.random.uniform(-1,1),np.random.uniform(-1,1)])
+        if length_squared(p) < 1:
+            return p
+
 def near_zero(x):
     s = 1e-8
     if np.max(np.abs(x)) < s:

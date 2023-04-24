@@ -1,5 +1,5 @@
 import numpy as np
-
+from vector_operations import *
 
 class ray:
     def __init__(self,origin,dir):
@@ -9,4 +9,19 @@ class ray:
     def at(self,t):
         return self.origin + self.dir*t
 
+    def get_color(self,world,depth):
+        if depth <= 0:
+            return np.array([0,0,0])
+
+        hit,record = world.hit(self,0.001,float('inf'))
+
+        if hit:
+            mat_scat_bool,scattered_ray,attenuation = record.material.scatter(self,record)
+            if mat_scat_bool:
+                return attenuation * scattered_ray.get_color(world,depth-1)
+
+
+        unit_dir = unit_vector(self.dir)
+        t = 0.5*unit_dir[1] + 1
+        return np.array([1,1,1])*(1-t) + np.array([.5,.7,1])*t#default sky shader
 

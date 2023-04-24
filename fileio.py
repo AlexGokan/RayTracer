@@ -20,12 +20,8 @@ def write_image(filename,w,h,pixels,gamma_correct='sqrt'):
         idx = 0
         for i in tqdm(range(h),desc='Saving: '):
             for j in range(w):
-                #r = i/(h-1)
-                #g = j/(w-1)
-                #b = 0.25
-
-                #color = vec3(r,g,b)
-                color = pixels[idx]
+                #color = pixels[idx]
+                color = pixels[i,j,:]
                 if gamma_correct == 'sqrt':
                     color[0] = np.sqrt(color[0])
                     color[1] = np.sqrt(color[1])
