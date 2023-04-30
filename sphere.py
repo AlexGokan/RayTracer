@@ -5,10 +5,11 @@ from vector_operations import *
 import numpy as np
 
 class sphere(hittable):
-    def __init__(self,center,radius,material):
+    def __init__(self,center,radius,mat):
+        assert(len(center) == 3)
         self.center = center
         self.radius = radius
-        self.material = material
+        self.material = mat
 
     def hit(self,r,t_min,t_max):
         oc = r.origin - self.center

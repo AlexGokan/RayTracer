@@ -15,13 +15,17 @@ class ray:
 
         hit,record = world.hit(self,0.001,float('inf'))
 
+
         if hit:
             mat_scat_bool,scattered_ray,attenuation = record.material.scatter(self,record)
             if mat_scat_bool:
+                #any ray is color(this_surface)*incoming ray which we find the below line
                 return attenuation * scattered_ray.get_color(world,depth-1)
+            else:
+                return np.array([0,0,0])
 
 
         unit_dir = unit_vector(self.dir)
-        t = 0.5*unit_dir[1] + 1
-        return np.array([1,1,1])*(1-t) + np.array([.5,.7,1])*t#default sky shader
-
+        t = 0.5*unit_dir[1] + 1#essentially the y component of our dir vector
+        #eturn np.array([1,1,1])*(1-t) + np.array([.5,.7,1])*t#default sky shader
+        return np.array([0.8,0.8,0.8])
