@@ -3,6 +3,7 @@ from hittable import *
 #from vec3 import *
 from vector_operations import *
 import numpy as np
+from axis_aligned_bb import *
 
 class sphere(hittable):
     def __init__(self,center,radius,mat):
@@ -36,3 +37,10 @@ class sphere(hittable):
         rec.material = self.material
 
         return True,rec
+
+
+    def bounding_box(self,t0,t1):
+        output_box = AABB(self.center-np.array([self.radius,self.radius,self.radius]),
+                          self.center+np.array([self.radius,self.radius,self.radius]))
+
+        return True,output_box

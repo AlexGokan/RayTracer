@@ -16,8 +16,9 @@ ground_mat = lambertian(npa([.5,.5,.5]))
 ground_sphere = sphere(npa([0,-1000,0]),1000,ground_mat)
 world_list.append(ground_sphere)
 
-for a in range(-11,11):
-    for b in range(-11,11):
+
+for a in range(-6,6):
+    for b in range(-6,6):
         mat_choice = np.random.uniform(0,1)
         center = npa([a + 0.8*np.random.uniform(-1,1),0.2,b + 0.8*np.random.uniform(-1,1)])
 
@@ -44,6 +45,7 @@ world_list.append(sphere(npa([4,1,0]),1.0,metal1))
 WORLD = hittable_list(world_list)
 
 
+
 #---------------Camera description------------------------------------------
 aspect_ratio = 16/9
 vert_fov = 20#degrees
@@ -54,11 +56,13 @@ aperture = .1
 focal_point = lookat
 
 
-img_width = 1200
+img_width = 300
 img_height = int(img_width/aspect_ratio)
 
 SCENE_CAMERA = camera(aspect_ratio=aspect_ratio,vert_fov=vert_fov,lookfrom=lookfrom,lookat=lookat,v_up=v_up,aperture=aperture,focal_point=focal_point)
 
 #---------------Rendering settings------------------------------------------
-samples_per_pixel = 6
-max_depth = 6
+samples_per_pixel = 2
+max_depth = 4
+num_processes = 8#going any higher than 8 doesn't really give any further benefit
+aa_strength = 1.0

@@ -10,8 +10,11 @@ from sphere import *
 from fileio import *
 from camera import *
 from material import *
-
+import multiprocessing as mp
+import time
 from scene_desc import *
+import queue
+import os
 
 import sys
 
@@ -31,30 +34,71 @@ def render_block(j,i_low,i_high,connection):
     connection.send(pixel_colors)
     connection.close()
 
-def main():
+def render_single_pixel(coord):
+    i,j = coord
+
+    u = (i + np.random.uniform(-.5, .5)*aa_strength) / (img_width - 1)
+    v = (img_height - j + np.random.uniform(-.5, .5)*aa_strength) / (img_height - 1)
+
+    r = SCENE_CAMERA.get_ray(u,v)
+    color = r.get_color(WORLD,max_depth)
+
+    return (i,j,color)
 
 
-    if len(sys.argv) < 2:
-        filename = None
-    else:
-        filename = sys.argv[1]
-    if filename is None or filename == '':
-        filename = 'sample.ppm'
+def render_with_pool():
+    stime = time.time()
 
-    #img_width = 60
+    j_s = [i for i in range(img_height)]
+    i_s = [i for i in range(img_width)]
 
-    print('Resolution: ' + str(img_width) +  ' x ' + str(img_height))
-    print('Filename: ' + filename)
+    pixel_colors = np.zeros((img_height, img_width, 3))
 
+
+    iv,jv = np.meshgrid(i_s,j_s)
+    iv,jv = iv.flatten(),jv.flatten()
+    coords = list(zip(iv,jv))
+
+    pool = mp.Pool(processes=num_processes)
+    results = pool.map(render_single_pixel,coords)
+
+    for c in results:
+        i,j,color = c
+        pixel_colors[j,i,:] = color
+
+    etime = time.time()
+    print('Render time: ',etime-stime)
+
+    return pixel_colors
+
+
+def render_single_process():
+    pixel_colors = np.zeros((img_height, img_width, 3))
+    for s in tqdm(range(samples_per_pixel), desc='Rendering: '):
+        for j in tqdm(range(img_height), desc='Col: '):
+            for i in range(img_width):
+                #we offset u and v by a small random amount to fix jaggies
+                #   I believe the book offsets by a random amount in (-1,1) but it makes more sense to do it in (-.5,.5) to me, idk
+                #v uses height-j to effectively do the count backwards
+
+                u = (i + np.random.uniform(-.5, .5)) / (img_width - 1)
+                v = (img_height - j + np.random.uniform(-.5, .5)) / (img_height - 1)
+
+                r = SCENE_CAMERA.get_ray(u, v)
+                pixel_colors[j,i,:] = pixel_colors[j,i,:] + r.get_color(WORLD, max_depth)
+                #take the average over a set of samples - add up here, divide out by sample_per_pixel at the end
+
+    return pixel_colors
+
+
+def render_10_processes():
     pipes = []
     for pid in range(10):
-        pipes.append(Pipe())#parent_conn,child_conn
+        pipes.append(Pipe())  # parent_conn,child_conn
 
-
-
-    pixel_colors = np.zeros((img_height,img_width,3))
-    for s in tqdm(range(samples_per_pixel),desc='Rendering: '):
-        for j in tqdm(range(img_height),desc='Col: '):
+    pixel_colors = np.zeros((img_height, img_width, 3))
+    for s in tqdm(range(samples_per_pixel), desc='Rendering: '):
+        for j in tqdm(range(img_height), desc='Col: '):
             """
             for i in range(img_width):
                 #we offset u and v by a small random amount to fix jaggies
@@ -70,45 +114,51 @@ def main():
             """
             processes = []
             for pid in range(10):
-                p = Process(target=render_block,args=(j,pid*120,(pid+1)*120,pipes[pid][1]))
+                p = Process(target=render_block, args=(j, pid * 120, (pid + 1) * 120, pipes[pid][1]))
                 processes.append(p)
 
             for p in processes:
                 p.start()
-            #p1 = Process(target=render_block,args=(j,0,20,child1_conn,))
-            #p2 = Process(target=render_block,args=(j,20,40,child2_conn,))
-            #p3 = Process(target=render_block,args=(j,40,60,child3_conn,))
-
-            #p1.start()
-            #p2.start()
-            #p3.start()
 
             for pid in range(10):
-                pixel_colors[j,pid*120:(pid+1)*120,:] = pipes[pid][0].recv()
-
-            #pixel_colors[j, 0:20, :] = parent1_conn.recv()
-            #pixel_colors[j, 20:40, :] = parent2_conn.recv()
-            #pixel_colors[j, 40:60, :] = parent3_conn.recv()
-
+                pixel_colors[j, pid * 120:(pid + 1) * 120, :] = pipes[pid][0].recv()
 
             for pid in range(10):
                 processes[pid].join()
-            #p1.join()
-            #p2.join()
-            #p3.join()
+
+    return pixel_colors
+
+def norm(x):
+    x = np.copy(x)
+    x -= x.min()
+    x /= x.max()
+    return x
+
+def main():
 
 
-            #-------------------------------------
-            #pixel_colors[j,0:20,:] = render_block(j,0,20)
-            #pixel_colors[j,20:40,:] = render_block(j,20,40)
-            #pixel_colors[j,40:60,:] = render_block(j,40,60)
+    if len(sys.argv) < 2:
+        filename = None
+    else:
+        filename = sys.argv[1]
+    if filename is None or filename == '':
+        filename = 'sample.ppm'
 
-        write_image(filename+str(s),img_width,img_height,pixel_colors)#save intermediate images in case something happens
+    #img_width = 60
 
-    pixel_colors /= samples_per_pixel
+    print('Resolution: ' + str(img_width) +  ' x ' + str(img_height))
+    print('Filename: ' + filename)
 
+    image = np.zeros((img_height,img_width,3))
 
-    write_image(filename,img_width,img_height,pixel_colors)
+    for s in tqdm(range(samples_per_pixel)):
+        pixel_colors = render_with_pool()
+
+        print(np.shape(pixel_colors),np.shape(image))
+        #pixel_colors /= samples_per_pixel
+        image = image + pixel_colors/samples_per_pixel
+
+    write_image(filename,img_width,img_height,image)
 
 
 
