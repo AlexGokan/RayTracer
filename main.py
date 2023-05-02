@@ -15,6 +15,7 @@ import time
 from scene_desc import *
 import queue
 import os
+import matplotlib.pyplot as plt
 
 import sys
 
@@ -154,6 +155,9 @@ def main():
     for s in tqdm(range(samples_per_pixel)):
         #pixel_colors = render_single_process()
         pixel_colors = render_with_pool()
+
+        #plt.imshow(norm(pixel_colors))
+        #plt.show()
 
         print(np.shape(pixel_colors),np.shape(image))
         #pixel_colors /= samples_per_pixel

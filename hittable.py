@@ -27,7 +27,7 @@ class hittable:
     def hit(self,r,t_min,t_max):
         raise NotImplementedError()#need to be implemented by the subclass
 
-    def bounding_box(self,t0,t1):
+    def bounding_box(self,t0,t1):#will return an AABB object
         raise NotImplementedError()#need to be implemented by the subclass
 
 class hittable_list(hittable):
@@ -50,19 +50,20 @@ class hittable_list(hittable):
 
     def bounding_box(self,t0,t1):
         if len(self.objects) == 0:
-            return False,None
+            return None
 
         temp_box = AABB()
         output_box = AABB()
         first_box = True
 
         for object in self.objects:
-            bb_bool,temp_box = object.bounding_box(t0,t1)
-            if not bb_bool:
-                return False,None
+            temp_box = object.bounding_box(t0,t1)
+            if temp_box is None:
+                return None
             output_box = temp_box if first_box else surrounding_box(output_box,temp_box)
+            first_box = False
 
-        return True,output_box
+        return output_box
 
 
 class BVH_node(hittable):

@@ -43,4 +43,4 @@ class sphere(hittable):
         output_box = AABB(self.center-np.array([self.radius,self.radius,self.radius]),
                           self.center+np.array([self.radius,self.radius,self.radius]))
 
-        return True,output_box
+        return output_box
