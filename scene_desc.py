@@ -17,10 +17,13 @@ ground_sphere = sphere(npa([0,-1000,0]),1000,ground_mat)
 world_list.append(ground_sphere)
 
 
-for a in range(-6,6):
-    for b in range(-6,6):
+for a in range(-2,2):
+    for b in range(-2,2):
         mat_choice = np.random.uniform(0,1)
-        center = npa([a + 0.8*np.random.uniform(-1,1),0.2,b + 0.8*np.random.uniform(-1,1)])
+
+        aa = a*2
+        bb = b*2
+        center = npa([aa + 0.8*np.random.uniform(-1,1),0.2,bb + 0.8*np.random.uniform(-1,1)])
 
         if mat_choice < 0.75:
             color = random_vec3(0,1)
@@ -62,7 +65,7 @@ img_height = int(img_width/aspect_ratio)
 SCENE_CAMERA = camera(aspect_ratio=aspect_ratio,vert_fov=vert_fov,lookfrom=lookfrom,lookat=lookat,v_up=v_up,aperture=aperture,focal_point=focal_point)
 
 #---------------Rendering settings------------------------------------------
-samples_per_pixel = 2
-max_depth = 4
+samples_per_pixel = 1
+max_depth = 2
 num_processes = 8#going any higher than 8 doesn't really give any further benefit
 aa_strength = 1.0

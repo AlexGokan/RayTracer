@@ -37,8 +37,8 @@ def render_block(j,i_low,i_high,connection):
 def render_single_pixel(coord):
     i,j = coord
 
-    u = (i + np.random.uniform(-.5, .5)*aa_strength) / (img_width - 1)
-    v = (img_height - j + np.random.uniform(-.5, .5)*aa_strength) / (img_height - 1)
+    u = (i + np.random.uniform(-.5, .5)) / (img_width - 1)
+    v = (img_height - j + np.random.uniform(-.5, .5)) / (img_height - 1)
 
     r = SCENE_CAMERA.get_ray(u,v)
     color = r.get_color(WORLD,max_depth)
@@ -152,6 +152,7 @@ def main():
     image = np.zeros((img_height,img_width,3))
 
     for s in tqdm(range(samples_per_pixel)):
+        #pixel_colors = render_single_process()
         pixel_colors = render_with_pool()
 
         print(np.shape(pixel_colors),np.shape(image))
