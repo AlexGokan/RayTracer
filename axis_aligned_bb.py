@@ -13,11 +13,11 @@ class AABB:
 
     def hit_slow(self,r,t_min,t_max):
         for a in range(3):
-            t0 = min((self.minimum[a]-r.origin()[a])/r.dir()[a],
-                     (self.maximum[a] - r.origin()[a]) / r.dir()[a])
+            t0 = min((self.minimum[a]-r.origin[a])/r.dir[a],
+                     (self.maximum[a] - r.origin[a]) / r.dir[a])
 
-            t1 = max((self.minimum[a]-r.origin()[a])/r.dir()[a],
-                     (self.maximum[a] - r.origin()[a]) / r.dir()[a])
+            t1 = max((self.minimum[a]-r.origin[a])/r.dir[a],
+                     (self.maximum[a] - r.origin[a]) / r.dir[a])
 
             t_min = max(t0,t_min)
             t_max = max(t1,t_max)
@@ -28,9 +28,9 @@ class AABB:
 
     def hit_fast(self,r,t_min,t_max):
         for a in range(3):
-            invD = 1.0/r.dir()[a]
-            t0 = (self.minimum[a] - r.origin()[a]) * invD
-            t1 = (self.maximum[a] - r.origin()[a]) * invD
+            invD = 1.0/r.dir[a]
+            t0 = (self.minimum[a] - r.origin[a]) * invD
+            t1 = (self.maximum[a] - r.origin[a]) * invD
             if invD < 0.0:
                 t0,t1 = t1,t0
 

@@ -48,6 +48,8 @@ class BVH_node(hittable):
         comparator = compare_funcs[axis]
 
         object_span = self.end - self.start
+
+
         if object_span == 1:
             self.left = self.objects.objects[self.start]
             self.right = self.objects.objects[self.start]
@@ -55,12 +57,22 @@ class BVH_node(hittable):
             if comparator(self.objects.objects[self.start],self.objects.objects[self.start+1]):
                 self.left = self.objects.objects[self.start+1]
                 self.right = self.objects.objects[self.start]
+            else:
+                self.right = self.objects.objects[self.start + 1]
+                self.left = self.objects.objects[self.start]
         else:
             self.objects.objects.sort(key=cmp_to_key(comparator))
             mid = self.start + object_span//2
             self.left = BVH_node(self.objects,t0,t1,self.start,mid)
             self.right = BVH_node(self.objects,t0,t1,mid,self.end)
 
+        l_box = self.left.bounding_box(t0,t1)
+        r_box = self.right.bounding_box(t0,t1)
+
+        if l_box is None or r_box is None:
+            raise ValueError('no bounding box in bvh_node constructor')
+
+        self.box = surrounding_box(l_box,r_box)
 
     def bounding_box(self,t0,t1):
         return self.box
@@ -70,6 +82,14 @@ class BVH_node(hittable):
             return False
 
         hit_left,hit_record = self.left.hit(r,t_min,t_max)
-        hit_right,hit_record = self.right.hit(r,t_min,hit_record.t if hit_left else t_max)
+        #print(hit_left,hit_record)
+        #if hit_left:
+        #    r_t_max = hit_record.t
+        #else:
+        #    r_t_max = t_max
+        r_t_max = t_max#TODO fix this
+        hit_right = False
+        if not hit_left:
+            hit_right,hit_record = self.right.hit(r,t_min,r_t_max)
 
         return hit_left or hit_right,hit_record

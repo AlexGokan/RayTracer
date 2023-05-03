@@ -51,7 +51,7 @@ world_list.append(sphere(npa([4,1,0]),1.0,metal1))
 WORLD = hittable_list(world_list)
 
 print('building BVH')
-BVH = BVH_node(WORLD,0,float('inf'))
+BVH = BVH_node(WORLD, 0, float('inf'))
 print('BVH built')
 
 #---------------Camera description------------------------------------------

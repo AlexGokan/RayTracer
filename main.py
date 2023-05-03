@@ -42,7 +42,8 @@ def render_single_pixel(coord):
     v = (img_height - j + np.random.uniform(-.5, .5)) / (img_height - 1)
 
     r = SCENE_CAMERA.get_ray(u,v)
-    color = r.get_color(WORLD,max_depth)
+    #print(BVH)
+    color = r.get_color(WORLD,BVH,max_depth)
 
     return (i,j,color)
 
@@ -152,6 +153,8 @@ def main():
 
     image = np.zeros((img_height,img_width,3))
 
+
+
     for s in tqdm(range(samples_per_pixel)):
         #pixel_colors = render_single_process()
         pixel_colors = render_with_pool()
@@ -160,7 +163,6 @@ def main():
         #plt.show()
 
         print(np.shape(pixel_colors),np.shape(image))
-        #pixel_colors /= samples_per_pixel
         image = image + pixel_colors/samples_per_pixel
 
     write_image(filename,img_width,img_height,image)
